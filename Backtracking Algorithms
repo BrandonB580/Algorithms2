@@ -1,0 +1,56 @@
+import random
+import time
+
+# Depth-First Search Algorithm
+def dfs_knapsack(capacity, weights, values, n):
+    if n == 0 or capacity == 0:
+        return 0
+    if (weights[n-1] > capacity):
+        return dfs_knapsack(capacity, weights, values, n-1)
+    else:
+        return max(values[n-1] + dfs_knapsack(capacity-weights[n-1], weights, values, n-1),
+                   dfs_knapsack(capacity, weights, values, n-1))
+
+# Breadth-First Search Algorithm
+def bfs_knapsack(capacity, weights, values, n):
+    q = [(0, 0, capacity)]
+    max_value = 0
+    while q:
+        value, level, rem_capacity = q.pop(0)
+        if level == n:
+            max_value = max(max_value, value)
+        else:
+            if weights[level] <= rem_capacity:
+                q.append((value+values[level], level+1, rem_capacity-weights[level]))
+            q.append((value, level+1, rem_capacity))
+    return max_value
+
+# Generate Random Data Set
+n = 10
+capacity = 50
+weights = [random.randint(1, 20) for i in range(n)]
+values = [random.randint(1, 100) for i in range(n)]
+
+# Print Generated Data Set
+print("Knapsack Problem")
+print("Capacity:", capacity)
+print("Weights:", weights)
+print("Values:", values)
+
+# Solve Using DFS Algorithm
+start_time = time.time()
+dfs_max_value = dfs_knapsack(capacity, weights, values, n)
+end_time = time.time()
+dfs_time = end_time - start_time
+print("\nDFS Algorithm")
+print("Maximum Value:", dfs_max_value)
+print("Time:", dfs_time)
+
+# Solve Using BFS Algorithm
+start_time = time.time()
+bfs_max_value = bfs_knapsack(capacity, weights, values, n)
+end_time = time.time()
+bfs_time = end_time - start_time
+print("\nBFS Algorithm")
+print("Maximum Value:", bfs_max_value)
+print("Time:", bfs_time)
