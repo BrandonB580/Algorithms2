@@ -1,0 +1,65 @@
+
+import random
+import time
+
+# Generate random dataset for knapsack problem
+def generate_dataset(n_items, max_weight, max_value):
+    items = []
+    for i in range(n_items):
+        weight = random.randint(1, max_weight)
+        value = random.randint(1, max_value)
+        items.append((weight, value))
+    return items
+
+# Dynamic programming approach to solve knapsack problem
+def knapsack_dp(items, capacity):
+    n_items = len(items)
+    # Initialize two-dimensional array to store values for each combination of items and capacity
+    dp = [[0 for _ in range(capacity + 1)] for _ in range(n_items + 1)]
+    # Fill array using dynamic programming approach
+    for i in range(1, n_items + 1):
+        weight_i, value_i = items[i-1]
+        for j in range(1, capacity + 1):
+            if weight_i <= j:
+                dp[i][j] = max(dp[i-1][j], dp[i-1][j-weight_i] + value_i)
+            else:
+                dp[i][j] = dp[i-1][j]
+    # Extract solution from array
+    knapsack = []
+    j = capacity
+    for i in range(n_items, 0, -1):
+        if dp[i][j] > dp[i-1][j]:
+            knapsack.append(i-1)
+            j -= items[i-1][0]
+    return dp[n_items][capacity], knapsack[::-1]
+
+# Greedy algorithm approach to solve knapsack problem
+def knapsack_greedy(items, capacity):
+    items_sorted = sorted(items, key=lambda x: x[1]/x[0], reverse=True)
+    knapsack = []
+    for item in items_sorted:
+        if item[0] <= capacity:
+            knapsack.append(items.index(item))
+            capacity -= item[0]
+    return sum(items[i][1] for i in knapsack), knapsack
+
+# Main function to run both approaches and measure time taken
+if __name__ == '__main__':
+    n_items = 50
+    max_weight = 100
+    max_value = 100
+    capacity = 500
+    items = generate_dataset(n_items, max_weight, max_value)
+    
+    start_time = time.time()
+    dp_result = knapsack_dp(items, capacity)
+    dp_time = time.time() - start_time
+    
+    start_time = time.time()
+    greedy_result = knapsack_greedy(items, capacity)
+    greedy_time = time.time() - start_time
+    
+    print("Dynamic programming result: ", dp_result)
+    print("Time taken for dynamic programming: ", dp_time)
+    print("Greedy algorithm result: ", greedy_result)
+    print("Time taken for greedy algorithm: ", greedy_time)
