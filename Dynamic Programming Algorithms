@@ -1,0 +1,57 @@
+import time
+import random
+import math
+
+def binomial_coefficient_dp(n, k):
+    dp = [[0 for j in range(k+1)] for i in range(n+1)]
+    for i in range(n+1):
+        for j in range(min(i,k)+1):
+            if j == 0 or j == i:
+                dp[i][j] = 1
+            else:
+                dp[i][j] = dp[i-1][j-1] + dp[i-1][j]
+    return dp[n][k]
+
+def binomial_coefficient_dc(n, k):
+    if k > n-k:
+        k = n-k
+    if k == 0:
+        return 1
+    if k == 1:
+        return n
+    numerator = [i+1 for i in range(n-k)]
+    denominator = [i+1 for i in range(k)]
+    for i in range(n-k):
+        for j in range(k):
+            current_gcd = math.gcd(numerator[i], denominator[j])
+            numerator[i] //= current_gcd
+            denominator[j] //= current_gcd
+    result = 1
+    for i in range(n-k):
+        result *= numerator[i]
+    return result
+
+def create_dataset(n):
+    dataset = []
+    for i in range(n):
+        dataset.append((random.randint(1,50), random.randint(1,50)))
+    return dataset
+
+n = 1000
+dataset = create_dataset(n)
+
+print("Dataset:")
+print(dataset)
+
+start = time.time()
+for n, k in dataset:
+    binomial_coefficient_dp(n, k)
+end = time.time()
+print("Dynamic Programming Time: ", end-start)
+
+start = time.time()
+for n, k in dataset:
+    binomial_coefficient_dc(n, k)
+end = time.time()
+print("Divide and Conquer Time: ", end-start)
+
